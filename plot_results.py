@@ -6,6 +6,30 @@ import os
 
 def plot_results(results):
     
+
+    num_episodes = len(results["eval_rewards"])
+
+    metrics = [
+        ["Average Reward", f"{results['eval_rewards'].mean():.2f}"],
+        ["Success Rate (on pad)", f"{100 * results['successful_landings'] / num_episodes:.2f}%"],
+        ["Crash Rate", f"{100 * results['crashes'] / num_episodes:.2f}%"],
+        ["Landed Outside Pad", f"{100 * results['landed_outside_pad'] / num_episodes:.2f}%"],
+        ["Ran Out of Fuel", f"{100 * results['ran_out_of_fuel'] / num_episodes:.2f}%"]
+    ]
+
+    column_labels = ["Metric", "Value"]
+
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.axis('off')
+    table = ax.table(cellText=metrics, colLabels=column_labels, loc='center', cellLoc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(12)
+    table.scale(1.5, 1.5)
+
+    plt.title("Evaluation Metrics", fontsize=16, weight='bold', pad=20)
+    plt.tight_layout()
+    plt.show()
+
     # --- Plot 1: Distribution of Total Rewards ---
     plt.figure(figsize=(8, 6))
     plt.hist(results['eval_rewards'], bins=20, edgecolor='black')
@@ -15,9 +39,8 @@ def plot_results(results):
     plt.show()
     
     # --- Plot 2: Scatter Plot of Remaining Fuel vs Total Reward ---
-    # Scale eval_rewards by 1/2 if needed (as in your previous code)
     final_fuel = np.array(results['final_fuel'])
-    eval_rewards_scaled = np.array(results['eval_rewards']) / 2
+    eval_rewards_scaled = np.array(results['eval_rewards'])
     crashed_flags = np.array(results['crashed_flags'])
     
     plt.figure(figsize=(8, 6))
@@ -30,7 +53,6 @@ def plot_results(results):
     plt.title("Remaining Fuel vs Total Reward (Crash vs Safe Landing)")
     plt.legend()
     plt.grid(True)
-    plt.savefig("fuel_reward.pdf")
     plt.show()
     
     # --- Plot 3: Mean Trajectory with Variability ---
@@ -75,5 +97,5 @@ def plot_results(results):
     plt.title('Lunar Lander Mean Trajectory with Variability')
     plt.legend()
     plt.grid(True)
-    plt.savefig('trajectories_avg.pdf')
     plt.show()
+
